@@ -1,6 +1,7 @@
 // Load express
 var express = require('express');
 var path = require('path');
+var bodyParser = require('body-parser');
 
 // Create our express app
 var app = express();
@@ -9,15 +10,12 @@ var app = express();
 app.set('view engine', 'ejs'); // 'set' method is used to configure the app's settings
 app.set('views', path.join(__dirname, 'views')); // where our views can be found
 app.locals.title = 'First Express';
-app.locals.todos = [
-  {todo: 'Feed dogs', done: true},
-  {todo: 'Learn Express', done: false},
-  {todo: 'Have fun', done: true},
-];
+app.locals.todos = require('./data/todos');
 
 // Mount middleware (app.use)
-
-
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 // require and mount (app.use) routes
@@ -40,7 +38,10 @@ app.get('/todos', function(req, res) {
 });
 
 app.post('/todos', function(req, res) {
-  console.log(req.body.newTodo);
+  app.locals.todos.push({
+    todo: req.body.newTodo,
+    done: false
+  });
   res.render('todos/index');
 });
 
