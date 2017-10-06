@@ -1,13 +1,19 @@
 // Load express
 var express = require('express');
+var path = require('path');
 
 // Create our express app
 var app = express();
 
 // Configure the app (app.set)
-
-
-
+app.set('view engine', 'ejs'); // 'set' method is used to configure the app's settings
+app.set('views', path.join(__dirname, 'views')); // where our views can be found
+app.locals.title = 'First Express';
+app.locals.todos = [
+  {todo: 'Feed dogs', done: true},
+  {todo: 'Learn Express', done: false},
+  {todo: 'Have fun', done: true},
+];
 
 // Mount middleware (app.use)
 
@@ -15,7 +21,10 @@ var app = express();
 
 
 // require and mount (app.use) routes
-
+app.use(function(req, res, next) {
+  console.log(req.headers['user-agent']);
+  next();
+});
 
 
 
@@ -23,16 +32,25 @@ var app = express();
 // Later, we will use the router object
 app.get('/', function(req, res) {
   var msg = req.query.msg ? req.query.msg : '!';
-  res.send('<h1>Hello Express ' + msg + '</h1>');
+  res.render('home');
 });
 
-app.get('/goodbye', function(req, res) {
-  res.send('<h1>Goodbye World</h1>');
+app.get('/todos', function(req, res) {
+  res.render('todos/index');
 });
 
-app.get('/goodbye/:name', function(req, res) {
-  res.send('Goodbye ' + req.params.name);
+app.post('/todos', function(req, res) {
+  console.log(req.body.newTodo);
+  res.render('todos/index');
 });
+
+// app.get('/goodbye', function(req, res) {
+//   res.json( {msg: 'Goodbye World'} );
+// });
+
+// app.get('/goodbye/:name', function(req, res) {
+//   res.send('Goodbye ' + req.params.name);
+// });
 
 
 // Tell the app to listen on port 3000
